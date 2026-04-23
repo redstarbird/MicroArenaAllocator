@@ -13,19 +13,14 @@ struct MemoryArena
 struct MemoryArena *CreateArena(size_t size)
 {
     // Allocate memory for the MemoryArena struct
-    struct MemoryArena *arena = (struct MemoryArena *)malloc(sizeof(struct MemoryArena));
+    struct MemoryArena *arena = (struct MemoryArena *)malloc(sizeof(struct MemoryArena) + size);
     if (!arena)
     {
         return NULL;
     }
 
-    // Allocate memory for the buffer
-    arena->buffer = (char *)malloc(size);
-    if (!arena->buffer)
-    {
-        free(arena);
-        return NULL;
-    }
+    // Set the buffer pointer to the memory immediately following the MemoryArena struct
+    arena->buffer = (char *)(arena + 1);
 
     // Initialize the MemoryArena fields
     arena->size = size;
