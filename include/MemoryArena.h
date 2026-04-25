@@ -51,7 +51,7 @@ void DestroyArena(struct MemoryArena *arena);
 
 // Push a raw block of unaligned memory
 #define PushSize(arena, size) \
-    (memset(PushSizeNoInit(arena, size)), 0, (size))
+    ((type *)memset(PushSizeNoInit(arena, size), 0, (size)))
 
 // Pushes raw data into the arena (useful for strings and other non-struct data)
 #define PushData(arena, data, size) \
