@@ -8,7 +8,18 @@ struct MemoryArena
     char *buffer;
     size_t size;
     size_t offset;
+    size_t peakOffset;
 };
+
+// Outputs the current stats of the memory arena, including total size, used space, peak usage, and free space
+void OutputArenaStats(struct MemoryArena *arena)
+{
+    printf("Memory Arena Stats:\n");
+    printf("Total Size: %zu bytes\n", arena->size);
+    printf("Used: %zu bytes\n", arena->offset);
+    printf("Peak Usage: %zu bytes\n", arena->peakOffset);
+    printf("Free: %zu bytes\n", arena->size - arena->offset);
+}
 
 struct MemoryArena *CreateArena(size_t size)
 {
