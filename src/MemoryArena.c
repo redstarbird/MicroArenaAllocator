@@ -36,6 +36,7 @@ struct MemoryArena *CreateArena(size_t size)
     // Initialize the MemoryArena fields
     arena->size = size;
     arena->offset = 0;
+    arena->peakOffset = 0;
 
     return arena;
 }
@@ -71,6 +72,12 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
 
     // Move the offset to the aligned address
     arena->offset += padding + size;
+
+    // Update the peak offset if necessary
+    if (arena->offset > arena->peakOffset)
+    {
+        arena->peakOffset = arena->offset;
+    }
 
     // Return the aligned address
     return (void *)alignedAddress;
