@@ -11,6 +11,12 @@ struct MemoryArena
     size_t peakOffset;
 };
 
+struct TempArena
+{
+    struct MemoryArena *arena;
+    size_t offset;
+};
+
 // Outputs the current stats of the memory arena, including total size, used space, peak usage, and free space
 void OutputArenaStats(struct MemoryArena *arena)
 {
@@ -81,4 +87,19 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
 
     // Return the aligned address
     return (void *)alignedAddress;
+}
+
+struct TempArena BeginTempArena(struct MemoryArena *arena)
+{
+    // Create a temporary arena for the current arena state
+    struct TempArena temp;
+    temp.arena = arena;
+    temp.offset = arena->offset;
+    return temp;
+}
+
+void EndTempArena(struct TempArena temp)
+{
+    // Return the arena to the offset saved in the temporary arena, this essentially erases any allocations within the temporary arena
+    temp.arena->offset = temp.offset;
 }

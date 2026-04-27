@@ -7,11 +7,14 @@
 #include <string.h>
 
 typedef struct MemoryArena MemoryArena;
+typedef struct TempArena TempArena;
 
 struct MemoryArena *CreateArena(size_t size);
 void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment);
 void DestroyArena(struct MemoryArena *arena);
 void OutputArenaStats(struct MemoryArena *arena);
+struct TempArena BeginTempArena(struct MemoryArena *arena);
+void EndTempArena(struct TempArena temp);
 
 // ------
 // Macros
