@@ -51,10 +51,6 @@ void DestroyArena(struct MemoryArena *arena)
 {
     if (arena)
     {
-        if (arena->buffer)
-        {
-            free(arena->buffer);
-        }
         free(arena);
     }
 }
