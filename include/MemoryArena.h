@@ -5,6 +5,8 @@
 #include <stddef.h>
 // Include string.h for memset and memcpy
 #include <string.h>
+// For printf
+#include <stdio.h>
 
 typedef struct MemoryArena MemoryArena;
 typedef struct TempArena TempArena;
