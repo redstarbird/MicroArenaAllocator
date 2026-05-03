@@ -16,5 +16,12 @@ endif()
 # Define the source files for the MemoryArena library
 add_library(MemoryArena STATIC src/MemoryArena.c)
 
+# Add the additional source files for the MemoryArena library
+target_sources(MemoryArena
+    PRIVATE
+        src/StringPool.c
+        src/Hash.c
+)
+
 # Include the header files for the MemoryArena library
 target_include_directories(MemoryArena PUBLIC include)
