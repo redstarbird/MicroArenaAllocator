@@ -57,7 +57,7 @@ void EndTempArena(struct TempArena temp);
 
 // Push a raw block of unaligned memory
 #define PushSize(arena, size) \
-    ((type *)memset(PushSizeNoInit(arena, size), 0, (size)))
+    ((void *)memset(PushSizeNoInit(arena, size), 0, (size)))
 
 // Pushes raw data into the arena (useful for strings and other non-struct data)
 #define PushData(arena, data, size) \
