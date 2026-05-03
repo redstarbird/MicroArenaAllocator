@@ -9,6 +9,11 @@ struct MemoryArena
     size_t size;
     size_t offset;
     size_t peakOffset;
+
+    // Out of memory handling policy for the arena
+    enum oomPolicy oomPolicy;
+    // Optional callback function for OOM handling when the policy is OOM_CALLBACK
+    void (*oomCallback)(struct MemoryArena *arena, size_t requestedSize);
 };
 
 struct TempArena
@@ -27,7 +32,7 @@ void OutputArenaStats(struct MemoryArena *arena)
     printf("Free: %zu bytes\n", arena->size - arena->offset);
 }
 
-struct MemoryArena *CreateArena(size_t size)
+struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
 {
     // Allocate memory for the MemoryArena struct
     struct MemoryArena *arena = (struct MemoryArena *)malloc(sizeof(struct MemoryArena) + size);
@@ -65,9 +70,20 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
     // Calculate the padding needed to achieve the aligned address
     size_t padding = alignedAddress - currentAddress;
 
-    // Check that the arena has enough space for the requested size and padding
+    // Check if there is enough space in the arena for the requested size and padding
     if (arena->offset + padding + size > arena->size)
     {
+        // Handle out of memory based on the arena's OOM policy
+        switch (arena->oomPolicy)
+        {
+        case OOM_RETURN_NULL:
+            return NULL;
+        case OOM_ABORT:
+            fprintf(stderr, "Out of memory in arena allocation. Requested size: %zu bytes\n", size);
+            abort();
+            break;
+        }
+
         // Not enough space in the arena
         return NULL;
     }

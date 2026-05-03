@@ -11,7 +11,16 @@
 typedef struct MemoryArena MemoryArena;
 typedef struct TempArena TempArena;
 
-struct MemoryArena *CreateArena(size_t size);
+// Out of memory handling policies for the arena
+enum oomPolicy
+{
+    OOM_GROW_ARENA,
+    OOM_ABORT,
+    OOM_RETURN_NULL,
+    OOM_CALLBACK
+};
+
+struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t));
 void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment);
 void DestroyArena(struct MemoryArena *arena);
 void OutputArenaStats(struct MemoryArena *arena);
