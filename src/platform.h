@@ -13,7 +13,7 @@
 
 #elif defined(__linux__) || defined(__unix__) || defined(__APPLE__)
 
-#include <unistd.h>
+#include <sys/mman.h>
 
 // Define MAP_ANONYMOUS if it's not defined (some systems use MAP_ANON instead)
 #ifndef MAP_ANONYMOUS
