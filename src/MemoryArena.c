@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "platform.h"
+
+#if ARENA_USE_VIRTUAL_MEMORY
 struct MemoryArena
 {
     char *buffer;
@@ -21,6 +24,34 @@ struct TempArena
     struct MemoryArena *arena;
     size_t offset;
 };
+#else
+typedef struct ArenaBlock
+{
+    char *buffer;
+    size_t size;
+    size_t offset;
+    struct ArenaBlock *prev;
+} ArenaBlock;
+
+struct MemoryArena
+{
+    struct ArenaBlock *currentBlock;
+    size_t peakOffset;
+
+    // Out of memory handling policy for the arena
+    oomPolicy oomPolicy;
+    // Optional callback function for OOM handling when the policy is OOM_CALLBACK
+    void (*oomCallback)(struct MemoryArena *arena, size_t requestedSize);
+};
+
+struct TempArena
+{
+    struct MemoryArena *arena;
+    struct ArenaBlock *startBlock;
+    size_t offset;
+};
+
+#endif
 
 // Outputs the current stats of the memory arena, including total size, used space, peak usage, and free space
 void OutputArenaStats(struct MemoryArena *arena)
@@ -35,7 +66,7 @@ void OutputArenaStats(struct MemoryArena *arena)
 struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
 {
     // Allocate memory for the MemoryArena struct
-    struct MemoryArena *arena = (struct MemoryArena *)malloc(sizeof(struct MemoryArena) + size);
+    struct MemoryArena *arena = (struct MemoryArena *)ARENA_SYS_ALLOC(sizeof(struct MemoryArena) + size);
     if (!arena)
     {
         return NULL;
@@ -56,7 +87,7 @@ void DestroyArena(struct MemoryArena *arena)
 {
     if (arena)
     {
-        free(arena);
+        ARENA_SYS_FREE(arena, sizeof(struct MemoryArena) + arena->size);
     }
 }
 
@@ -101,6 +132,7 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
     return (void *)alignedAddress;
 }
 
+#if ARENA_USE_VIRTUAL_MEMORY
 struct TempArena BeginTempArena(struct MemoryArena *arena)
 {
     // Create a temporary arena for the current arena state
@@ -115,3 +147,38 @@ void EndTempArena(struct TempArena temp)
     // Return the arena to the offset saved in the temporary arena, this essentially erases any allocations within the temporary arena
     temp.arena->offset = temp.offset;
 }
+#else
+struct TempArena BeginTempArena(struct MemoryArena *arena)
+{
+    // Create a temporary arena for the current arena state
+    struct TempArena temp;
+    temp.arena = arena;
+    temp.startBlock = arena->currentBlock;
+    temp.offset = arena->currentBlock ? arena->currentBlock->offset : 0;
+    return temp;
+}
+
+void EndTempArena(struct TempArena temp)
+{
+    MemoryArena *arena = temp.arena;
+    struct ArenaBlock *block = arena->currentBlock;
+
+    while (block != temp.startBlock)
+    {
+        struct ArenaBlock *prev = block->prev;
+        free(block->buffer);
+        free(block);
+        block = prev;
+    }
+
+    if (block)
+    {
+        block->offset = temp.offset;
+        if (arena)
+        {
+            arena->currentBlock = block;
+        }
+    }
+}
+
+#endif
