@@ -23,7 +23,7 @@ typedef struct StringPool
     size_t capacity;
 } StringPool;
 
-struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize);
+struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t));
 StringView *InternString(struct StringPool *pool, const char *str, size_t length);
 void DestroyStringPool(struct StringPool *pool);
 

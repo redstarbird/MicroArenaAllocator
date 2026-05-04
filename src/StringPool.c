@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include "Hash.h"
 
-struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize)
+struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
 {
     // If initial size is not provided, default to 2 KB
     if (stringCount == 0)
@@ -28,7 +28,7 @@ struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize)
     }
 
     // Create the internal memory arena for the string pool
-    pool->arena = CreateArena(arenaSize);
+    pool->arena = CreateArena(arenaSize, policy, oomCallback);
     if (!pool->arena)
     {
         free(pool);
