@@ -150,7 +150,7 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
         case OOM_RETURN_NULL:
             return NULL;
         case OOM_ABORT:
-            fprintf(stderr, "Out of memory in arena allocation. Requested size: %zu bytes\n", size);
+            fprintf(stderr, "Out of memory in arena allocation. Requested size: %zu bytes, available: %zu\n", size, arena->size - arena->offset);
             abort();
         case OOM_CALLBACK:
             if (arena->oomCallback)
