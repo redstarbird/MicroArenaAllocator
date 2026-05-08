@@ -58,7 +58,7 @@ struct StringView *InternString(struct StringPool *pool, const char *str, size_t
     }
 
     // Calulate the hash of the input string
-    uint32_t hash = HashStringFNV1a_32(str, length);
+    uint32_t hash = HashString(str, length);
 
     // Calculate the index in the hash table using fast modulo (capacity must be a power of 2)
     size_t index = hash & (pool->capacity - 1);
