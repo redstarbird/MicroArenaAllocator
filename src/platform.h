@@ -24,6 +24,9 @@
 
 #include <sys/mman.h>
 
+// For sysconf to get the system page size
+#include <unistd.h>
+
 // Define MAP_ANONYMOUS if it's not defined (some macOS/BSD systems use MAP_ANON instead)
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS MAP_ANON
@@ -56,5 +59,25 @@
 #define ARENA_SYS_FREE(ptr, size) free(ptr)
 
 #endif
+
+// Return the operating system's memory page size
+size_t ArenaGetOSPageSize(void)
+{
+    // Cache the page size in a static variable to avoid redundant system calls
+    static size_t pageSize = 0;
+
+    if (pageSize == 0)
+    {
+#if defined(_WIN32) || defined(_WIN64)
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+        pageSize = sysInfo.dwPageSize;
+#else
+        pageSize = sysconf(_SC_PAGESIZE);
+#endif
+    }
+
+    return pageSize;
+}
 
 #endif // !PLATFORM_H

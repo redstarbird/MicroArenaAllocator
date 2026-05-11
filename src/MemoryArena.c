@@ -5,9 +5,6 @@
 
 #include "platform.h"
 
-// Page size for aligning arena memory allocations
-#define ARENA_PAGE_SIZE 4096
-
 #if ARENA_USE_VIRTUAL_MEMORY
 struct MemoryArena
 {
@@ -113,15 +110,17 @@ struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCa
     size_t actualReservedSize = (policy == OOM_GROW_ARENA) ? GB(1) : size;
 #endif
 
+    size_t osPageSize = ArenaGetOSPageSize();
+
     // Reserve virtual memory for the arena, this uses no physical memory yet
-    void *reservedMemory = ARENA_SYS_RESERVE(ARENA_PAGE_SIZE + actualReservedSize);
+    void *reservedMemory = ARENA_SYS_RESERVE(osPageSize + actualReservedSize);
     if (!reservedMemory)
     {
         return NULL;
     }
 
     // Commit the initial size of memory for the arena, this will allocate physical memory for the committed size
-    ARENA_SYS_COMMIT(reservedMemory, ARENA_PAGE_SIZE);
+    ARENA_SYS_COMMIT(reservedMemory, osPageSize);
 
     // Allocate memory for the MemoryArena struct
     struct MemoryArena *arena = (struct MemoryArena *)reservedMemory;
@@ -131,7 +130,7 @@ struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCa
     }
 
     // Set the buffer pointer to the memory immediately following the first page reserved for the MemoryArena struct
-    arena->buffer = (char *)reservedMemory + ARENA_PAGE_SIZE;
+    arena->buffer = (char *)reservedMemory + osPageSize;
 
     // Initialize the MemoryArena fields
     arena->committedSize = 0;
@@ -194,7 +193,9 @@ void DestroyArena(struct MemoryArena *arena)
     while (current != NULL)
     {
         struct MemoryArena *prev = current->prev;
-        ARENA_SYS_RELEASE(current, ARENA_PAGE_SIZE + current->reservedSize);
+
+        size_t osPageSize = ArenaGetOSPageSize();
+        ARENA_SYS_RELEASE(current, osPageSize + current->reservedSize);
         current = prev;
     }
 #else
