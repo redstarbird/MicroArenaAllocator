@@ -1,7 +1,7 @@
 #ifndef MEMORYARENA_H
 #define MEMORYARENA_H
 
-// Include stddef.h for size_t and _Alignof
+// Include stddef.h for size_t and offsetof
 #include <stddef.h>
 // Include string.h for memset and memcpy
 #include <string.h>
@@ -33,6 +33,22 @@ void DestroyArena(struct MemoryArena *arena);
 void OutputArenaStats(struct MemoryArena *arena);
 struct TempArena BeginTempArena(struct MemoryArena *arena);
 void EndTempArena(struct TempArena temp);
+
+#ifndef ALIGNOF
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+// 1. Standard C11 (Modern and perfectly safe)
+#define ALIGNOF(x) _Alignof(x)
+#elif defined(__GNUC__) || defined(__clang__)
+// 2. GCC/Clang
+#define ALIGNOF(x) __alignof__(x)
+#elif defined(_MSC_VER)
+// 3. MSVC
+#define ALIGNOF(x) __alignof(x)
+#else
+// 4. Catch-all C89/C99 Fallback (Unsafe and may not work correctly on all platforms, but provides a fallback for older compilers)
+#define ALIGNOF(type) offsetof(struct { char c; type t; }, t)
+#endif
+#endif
 
 // ------
 // Macros
