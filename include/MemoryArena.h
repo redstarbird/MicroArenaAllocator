@@ -46,7 +46,7 @@ void EndTempArena(struct TempArena temp);
 
 // Type safe allocation macros
 
-// Non-intializing allocation macros (unsafe but faster in some cases)
+// Non-intialising allocation macros (unsafe but faster in some cases)
 
 // Allocates a single struct with no initialization (unsafe but faster in some cases)
 #define PushStructNoInit(arena, type) \
@@ -56,28 +56,50 @@ void EndTempArena(struct TempArena temp);
 #define PushArrayNoInit(arena, type, count) \
     ((type *)arenaAllocAlign((arena), sizeof(type) * (count), _Alignof(type)))
 
-// Push a raw block of unaligned memory with no initialization (unsafe but faster in some cases)
+// Push a raw block of unaligned memory with no initialisation (unsafe but faster in some cases)
 #define PushSizeNoInit(arena, size) \
     arenaAllocAlign((arena), (size), 1)
 
 //
-// Initializing allocation macros (safe but slower in some cases)
+// Zero-initialising allocation macros (safe but slower in some cases)
 //
+
+// Internal helper function to safely zero-initialise memory only if allocation succeeded
+static inline void *arenaAllocAlignZero(struct MemoryArena *arena, size_t size, size_t alignment)
+{
+    void *ptr = arenaAllocAlign(arena, size, alignment);
+    if (ptr != NULL)
+    {
+        memset(ptr, 0, size);
+    }
+    return ptr;
+}
+
+// Internal helper function to safely copy data only if allocation succeeded
+static inline void *arenaPushDataHelper(struct MemoryArena *arena, const void *data, size_t size)
+{
+    void *ptr = arenaAllocAlign(arena, size, 1);
+    if (ptr != NULL)
+    {
+        memcpy(ptr, data, size);
+    }
+    return ptr;
+}
 
 // Allocates a single struct with zero initialization
 #define PushStruct(arena, type) \
-    ((type *)memset(PushStructNoInit((arena), type), 0, sizeof(type)))
+    ((type *)arenaAllocAlignZero((arena), sizeof(type), _Alignof(type)))
 
 // Allocate an array of structs with zero initialization
 #define PushArray(arena, type, count) \
-    ((type *)memset(PushArrayNoInit((arena), type, (count)), 0, sizeof(type) * (count)))
+    ((type *)arenaAllocAlignZero((arena), sizeof(type) * (count), _Alignof(type)))
 
-// Push a raw block of unaligned memory
+// Push a raw block of unaligned memory, zero initialized
 #define PushSize(arena, size) \
-    ((void *)memset(PushSizeNoInit(arena, size), 0, (size)))
+    arenaAllocAlignZero((arena), (size), 1)
 
 // Pushes raw data into the arena (useful for strings and other non-struct data)
 #define PushData(arena, data, size) \
-    memcpy(PushArrayNoInit((arena), char, (size)), (data), (size))
+    arenaPushDataHelper((arena), (data), (size))
 
 #endif // MEMORYARENA_H
