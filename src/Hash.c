@@ -286,5 +286,6 @@ uint64_t Hash_Wyhash(const void *key, size_t len, uint64_t seed)
     }
     return wymix(secret[1] ^ len, wymix(a ^ secret[1], b ^ seed));
 }
-
+#else
+#error "Invalid STRING_POOL_HASH_TYPE defined"
 #endif
