@@ -147,6 +147,34 @@ void TestStringPoolInterning()
     printf("[PASS] TestStringPoolInterning\n");
 }
 
+void TestStringPoolFormatInterning()
+{
+    struct StringPool *pool = CreateStringPool(512, MB(1), OOM_RETURN_NULL, NULL);
+    ASSERT_TRUE(pool != NULL, "Failed to create string pool");
+
+    // Intern a formatted string under 256 characters, should be interned directly without using the temporary arena
+    StringView *view1 = InternStringFormat(pool, "Value: %d", 42);
+    ASSERT_TRUE(view1 != NULL, "Failed to intern formatted string");
+    ASSERT_TRUE(strncmp(view1->data, "Value: 42", view1->length) == 0, "Formatted string content is incorrect");
+
+    // Intern the same formatted string again, should return the same StringView
+    StringView *view2 = InternStringFormat(pool, "Value: %d", 42);
+    ASSERT_TRUE(view2 != NULL, "Failed to intern formatted string a second time");
+    ASSERT_TRUE(view1 == view2, "Interned formatted string did not return the same StringView for duplicate formatted string!");
+
+    // Intern a longer formatted string that exceeds the stack buffer size, should use the temporary arena for formatting
+    char longFormat[300];
+    memset(longFormat, 'A', sizeof(longFormat) - 1);
+    longFormat[sizeof(longFormat) - 1] = '\0';
+    StringView *view3 = InternStringFormat(pool, "%s", longFormat);
+    ASSERT_TRUE(view3 != NULL, "Failed to intern long formatted string");
+    ASSERT_TRUE(strncmp(view3->data, longFormat, view3->length) == 0, "Long formatted string content is incorrect");
+
+    // Clean up
+    DestroyStringPool(pool);
+    printf("[PASS] TestStringPoolFormatInterning\n");
+}
+
 // Global static variables for testing the callback OOM policy
 static bool callbackCalled = false;
 static size_t callbackRequestedSize = 0;
@@ -195,6 +223,7 @@ int main()
     TestOOMGrowChaining();
     TestTempArena();
     TestStringPoolInterning();
+    TestStringPoolFormatInterning();
     TestOOMCallback();
 
     printf("================================\n");
