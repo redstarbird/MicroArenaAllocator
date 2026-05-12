@@ -16,7 +16,24 @@
 #endif
 
 typedef struct MemoryArena MemoryArena;
-typedef struct TempArena TempArena;
+
+#if ARENA_USE_VIRTUAL_MEMORY
+struct TempArena
+{
+    struct MemoryArena *arena;
+    size_t offset;
+};
+#else
+// Forward declaration of ArenaBlock for the non-virtual memory implementation
+struct ArenaBlock;
+
+struct TempArena
+{
+    struct MemoryArena *arena;
+    struct ArenaBlock *startBlock;
+    size_t offset;
+};
+#endif
 
 // Out of memory handling policies for the arena
 enum oomPolicy

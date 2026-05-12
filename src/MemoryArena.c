@@ -28,12 +28,6 @@ struct MemoryArena
     // Optional callback function for OOM handling when the policy is OOM_CALLBACK
     void (*oomCallback)(struct MemoryArena *arena, size_t requestedSize);
 };
-
-struct TempArena
-{
-    struct MemoryArena *arena;
-    size_t offset;
-};
 #else
 typedef struct ArenaBlock
 {
@@ -52,13 +46,6 @@ struct MemoryArena
     oomPolicy oomPolicy;
     // Optional callback function for OOM handling when the policy is OOM_CALLBACK
     void (*oomCallback)(struct MemoryArena *arena, size_t requestedSize);
-};
-
-struct TempArena
-{
-    struct MemoryArena *arena;
-    struct ArenaBlock *startBlock;
-    size_t offset;
 };
 
 #endif
