@@ -8,11 +8,15 @@
 // For printf
 #include <stdio.h>
 
-// Detect if virtual memory functions are available on the current platform
+// Detect if virtual memory functions are available on the current platform, if not already defined by the build system
+#ifndef ARENA_USE_VIRTUAL_MEMORY
+
 #if defined(_WIN32) || defined(_WIN64) || defined(__linux__) || defined(__unix__) || defined(__APPLE__)
 #define ARENA_USE_VIRTUAL_MEMORY 1
 #else
 #define ARENA_USE_VIRTUAL_MEMORY 0
+#endif
+
 #endif
 
 typedef struct MemoryArena MemoryArena;
