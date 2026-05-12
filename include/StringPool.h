@@ -26,5 +26,6 @@ typedef struct StringPool
 struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t));
 StringView *InternString(struct StringPool *pool, const char *str, size_t length);
 void DestroyStringPool(struct StringPool *pool);
+struct StringView *InternStringFormat(struct StringPool *pool, const char *format, ...);
 
 #endif // !STRINGPOOL_H

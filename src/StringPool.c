@@ -4,6 +4,8 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include "Hash.h"
 
 struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
@@ -96,6 +98,63 @@ struct StringView *InternString(struct StringPool *pool, const char *str, size_t
         // If the slot is occupied but does not match, continue probing to the next index (wrap around using bitwise AND)
         index = (index + 1) & (pool->capacity - 1);
     }
+}
+
+struct StringView *InternStringFormat(struct StringPool *pool, const char *format, ...)
+{
+    if (!pool || !format)
+    {
+        struct StringView *empty = {0};
+        return empty;
+    }
+
+    va_list args;
+    va_start(args, format);
+
+    // Small stack buffer (requires no dynamic allocation for short strings)
+    char stackBuffer[256];
+
+    int length = vsnprintf(stackBuffer, sizeof(stackBuffer), format, args);
+    va_end(args);
+
+    if (length < 0)
+    {
+        // Encoding error occurred
+        struct StringView *empty = {0};
+        return empty;
+    }
+
+    // If the formatted string fits in the stack buffer, intern it directly
+    if ((size_t)length < sizeof(stackBuffer))
+    {
+        return InternString(pool, stackBuffer, (size_t)length);
+    }
+
+    // For longer strings, use a temporary arena to format the string without risking stack overflow
+    struct TempArena tempArena = BeginTempArena(pool->arena);
+
+    // Allocate a temporary buffer in the arena for the formatted string including the null terminator
+    char *tempBuffer = (char *)PushArrayNoInit(pool->arena, char, length + 1);
+    if (!tempBuffer)
+    {
+        // Failed to allocate temporary buffer, return an empty StringView
+        EndTempArena(tempArena);
+        struct StringView *empty = {0};
+        return empty;
+    }
+
+    // Format the string into the temporary buffer
+    va_start(args, format);
+    vsnprintf(tempBuffer, length + 1, format, args);
+    va_end(args);
+
+    // Intern the formatted string from the temporary buffer
+    struct StringView *result = InternString(pool, tempBuffer, (size_t)length);
+
+    // End the temporary arena, this rolls back the temporary allocations in the arena
+    EndTempArena(tempArena);
+
+    return result;
 }
 
 // Destroys the provided string pool and frees all associated memory
