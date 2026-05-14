@@ -72,7 +72,7 @@ void TestMemoryAlignment()
 
     ASSERT_TRUE((((uintptr_t)uint64Ptr) % (size_t)ALIGNOF(uint64_t)) == 0, "uint64_t was not 8-byte aligned!");
 
-    ASSERT_EQUALS(8, (char *)uint64Ptr - (char *)charPtr, "uint64_t was not placed immediately after char!");
+    ASSERT_EQUALS((size_t)ALIGNOF(uint64_t), (char *)uint64Ptr - (char *)charPtr, "uint64_t was not placed immediately after char!");
 
     DestroyArena(arena);
     printf("[PASS] TestMemoryAlignment\n");
