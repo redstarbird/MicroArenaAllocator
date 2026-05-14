@@ -132,15 +132,15 @@ void TestStringPoolInterning()
     ASSERT_TRUE(pool != NULL, "Failed to create string pool");
 
     // Intern a string
-    StringView *view1 = InternString(pool, "Hello, World!", 13);
-    ASSERT_TRUE(view1 != NULL, "Failed to intern string");
+    StringView view1 = InternString(pool, "Hello, World!", 13);
+    ASSERT_TRUE(view1.data != NULL, "Failed to intern string");
 
     // Intern the same string again, should return the same StringView
-    StringView *view2 = InternString(pool, "Hello, World!", 13);
-    ASSERT_TRUE(view2 != NULL, "Failed to intern string a second time");
+    StringView view2 = InternString(pool, "Hello, World!", 13);
+    ASSERT_TRUE(view2.data != NULL, "Failed to intern string a second time");
 
     // Verify that the same StringView is returned for the duplicate string
-    ASSERT_TRUE(view1 == view2, "Interned string did not return the same StringView for duplicate string!");
+    ASSERT_TRUE(view1.data == view2.data && view1.length == view2.length, "Interned string did not return the same StringView for duplicate string!");
 
     // Clean up
     DestroyStringPool(pool);
@@ -153,22 +153,22 @@ void TestStringPoolFormatInterning()
     ASSERT_TRUE(pool != NULL, "Failed to create string pool");
 
     // Intern a formatted string under 256 characters, should be interned directly without using the temporary arena
-    StringView *view1 = InternStringFormat(pool, "Value: %d", 42);
-    ASSERT_TRUE(view1 != NULL, "Failed to intern formatted string");
-    ASSERT_TRUE(strncmp(view1->data, "Value: 42", view1->length) == 0, "Formatted string content is incorrect");
+    StringView view1 = InternStringFormat(pool, "Value: %d", 42);
+    ASSERT_TRUE(view1.data != NULL, "Failed to intern formatted string");
+    ASSERT_TRUE(strncmp(view1.data, "Value: 42", view1.length) == 0, "Formatted string content is incorrect");
 
     // Intern the same formatted string again, should return the same StringView
-    StringView *view2 = InternStringFormat(pool, "Value: %d", 42);
-    ASSERT_TRUE(view2 != NULL, "Failed to intern formatted string a second time");
-    ASSERT_TRUE(view1 == view2, "Interned formatted string did not return the same StringView for duplicate formatted string!");
+    StringView view2 = InternStringFormat(pool, "Value: %d", 42);
+    ASSERT_TRUE(view2.data != NULL, "Failed to intern formatted string a second time");
+    ASSERT_TRUE(view1.data == view2.data && view1.length == view2.length, "Interned formatted string did not return the same StringView for duplicate formatted string!");
 
     // Intern a longer formatted string that exceeds the stack buffer size, should use the temporary arena for formatting
     char longFormat[300];
     memset(longFormat, 'A', sizeof(longFormat) - 1);
     longFormat[sizeof(longFormat) - 1] = '\0';
-    StringView *view3 = InternStringFormat(pool, "%s", longFormat);
-    ASSERT_TRUE(view3 != NULL, "Failed to intern long formatted string");
-    ASSERT_TRUE(strncmp(view3->data, longFormat, view3->length) == 0, "Long formatted string content is incorrect");
+    StringView view3 = InternStringFormat(pool, "%s", longFormat);
+    ASSERT_TRUE(view3.data != NULL, "Failed to intern long formatted string");
+    ASSERT_TRUE(strncmp(view3.data, longFormat, view3.length) == 0, "Long formatted string content is incorrect");
 
     // Clean up
     DestroyStringPool(pool);

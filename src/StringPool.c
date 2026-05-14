@@ -51,12 +51,11 @@ struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum o
     return pool;
 }
 
-struct StringView *InternString(struct StringPool *pool, const char *str, size_t length)
+struct StringView InternString(struct StringPool *pool, const char *str, size_t length)
 {
     if (!pool || !str || length == 0)
     {
-        StringView *empty = {0};
-        return empty;
+        return (struct StringView){0};
     }
 
     // Calulate the hash of the input string
@@ -76,7 +75,7 @@ struct StringView *InternString(struct StringPool *pool, const char *str, size_t
             char *newText = (char *)PushData(pool->arena, str, length + 1);
             if (!newText)
             {
-                return &(struct StringView){0};
+                return (struct StringView){0};
             }
 
             newText[length] = '\0'; // Null-terminate the string
@@ -85,14 +84,15 @@ struct StringView *InternString(struct StringPool *pool, const char *str, size_t
             slot->length = length;
             pool->count++;
 
-            return slot;
+            // Return a copy of the StringView for the newly interned string
+            return *slot;
         }
 
         // If the slot is occupied, check if the existing string matches the input string
         if (slot->length == length && memcmp(slot->data, str, length) == 0)
         {
-            // The string already exists in the pool, return the existing StringView
-            return slot;
+            // The string already exists in the pool, return the a copy of the existing StringView
+            return *slot;
         }
 
         // If the slot is occupied but does not match, continue probing to the next index (wrap around using bitwise AND)
@@ -100,12 +100,11 @@ struct StringView *InternString(struct StringPool *pool, const char *str, size_t
     }
 }
 
-struct StringView *InternStringFormat(struct StringPool *pool, const char *format, ...)
+struct StringView InternStringFormat(struct StringPool *pool, const char *format, ...)
 {
     if (!pool || !format)
     {
-        struct StringView *empty = {0};
-        return empty;
+        return (struct StringView){0};
     }
 
     va_list args;
@@ -120,8 +119,7 @@ struct StringView *InternStringFormat(struct StringPool *pool, const char *forma
     if (length < 0)
     {
         // Encoding error occurred
-        struct StringView *empty = {0};
-        return empty;
+        return (struct StringView){0};
     }
 
     // If the formatted string fits in the stack buffer, intern it directly
@@ -139,8 +137,7 @@ struct StringView *InternStringFormat(struct StringPool *pool, const char *forma
     {
         // Failed to allocate temporary buffer, return an empty StringView
         EndTempArena(tempArena);
-        struct StringView *empty = {0};
-        return empty;
+        return (struct StringView){0};
     }
 
     // Format the string into the temporary buffer
@@ -149,7 +146,7 @@ struct StringView *InternStringFormat(struct StringPool *pool, const char *forma
     va_end(args);
 
     // Intern the formatted string from the temporary buffer
-    struct StringView *result = InternString(pool, tempBuffer, (size_t)length);
+    struct StringView result = InternString(pool, tempBuffer, (size_t)length);
 
     // End the temporary arena, this rolls back the temporary allocations in the arena
     EndTempArena(tempArena);
