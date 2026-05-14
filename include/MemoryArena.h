@@ -1,5 +1,12 @@
 #ifndef MEMORYARENA_H
 #define MEMORYARENA_H
+/**
+ * @file MemoryArena.h
+ * @brief A high-performance, cross-platform memory arena allocator.
+ * * @warning By design, this memory arena is NOT thread-safe. Do not share a single
+ * MemoryArena instance across multiple threads.
+ * For multi-threading, create a separate arena per thread.
+ */
 
 // Include stddef.h for size_t and offsetof
 #include <stddef.h>
