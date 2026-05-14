@@ -50,9 +50,9 @@ jobs:
               run: cmake -B build -S . ${{ matrix.cmake_args }}
 
             - name: Build
-              run: cmake --build build
+              run: cmake --build build --config Debug
 
             # Run CTest
             - name: Run Tests
               working-directory: ./build
-              run: ctest --output-on-failure
+              run: ctest --output-on-failure -C Debug
