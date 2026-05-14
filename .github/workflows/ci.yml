@@ -13,7 +13,7 @@ jobs:
 
         # Create a matrix of different OS and CMake configurations to test various scenarios
         strategy:
-            fail-fast: false # If one VM fails, let Linux keep running to detect more issues
+            fail-fast: false # Allows all matrix jobs to complete even if one job fails
             matrix:
                 include:
                     - name: "Linux (64-bit, Virtual Memory)"
@@ -42,7 +42,7 @@ jobs:
 
             # Install 32-bit C libraries on Linux if running the 32-bit test
             - name: Install 32-bit multilib (Linux Only)
-              if: matrix.name == 'Linux (32-bit, Virtual Memory)'
+              if: "matrix.name == 'Linux (32-bit, Virtual Memory)' || matrix.name == 'linux (32-bit, virtual memory)'"
               run: sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib
 
             # Configure CMake using the specific arguments from the matrix
@@ -55,4 +55,4 @@ jobs:
             # Run CTest
             - name: Run Tests
               working-directory: ./build
-              run: ctest --output-on-failure -C Debug
+              run: ctest --output-on-failure -V -C Debug
