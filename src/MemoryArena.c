@@ -231,7 +231,7 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
             return NULL;
 
         case OOM_GROW_ARENA:
-
+        {
 #ifdef ARENA_USE_VIRTUAL_MEMORY
 
 #if defined(_M_X64) || defined(__x86_64__)
@@ -300,6 +300,7 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
             padding = alignedAddress - currentAddress;
             newOffset = arena->offset + padding + size;
             break;
+        } // Extra scope for OOM_GROW_ARENA case (C11 and older C standards do not allow declarations in switch cases without extra scope)
         }
     }
 
