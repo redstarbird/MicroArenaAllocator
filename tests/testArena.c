@@ -26,7 +26,7 @@
         }                                                                                                                             \
     } while (0)
 
-void TestBasicAllocation()
+void TestBasicAllocation(void)
 {
     struct MemoryArena *arena = CreateArena(MB(1), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
@@ -44,7 +44,7 @@ void TestBasicAllocation()
     printf("[PASS] TestBasicAllocation\n");
 }
 
-void TestOOMReturnNull()
+void TestOOMReturnNull(void)
 {
     struct MemoryArena *arena = CreateArena(KB(1), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
@@ -61,7 +61,7 @@ void TestOOMReturnNull()
     printf("[PASS] TestOOMReturnNull\n");
 }
 
-void TestMemoryAlignment()
+void TestMemoryAlignment(void)
 {
     MemoryArena *arena = CreateArena(KB(4), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(arena != NULL, "Arena failed to create");
@@ -78,7 +78,7 @@ void TestMemoryAlignment()
     printf("[PASS] TestMemoryAlignment\n");
 }
 
-void TestOOMGrowChaining()
+void TestOOMGrowChaining(void)
 {
     // Create an arena with a small initial size and OOM_GROW_ARENA policy
     struct MemoryArena *arena = CreateArena(128, OOM_GROW_ARENA, NULL);
@@ -100,7 +100,7 @@ void TestOOMGrowChaining()
     printf("[PASS] TestOOMGrowChaining\n");
 }
 
-void TestTempArena()
+void TestTempArena(void)
 {
     struct MemoryArena *arena = CreateArena(MB(2), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
@@ -126,7 +126,7 @@ void TestTempArena()
     printf("[PASS] TestTempArena\n");
 }
 
-void TestStringPoolInterning()
+void TestStringPoolInterning(void)
 {
     struct StringPool *pool = CreateStringPool(512, MB(1), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(pool != NULL, "Failed to create string pool");
@@ -147,7 +147,7 @@ void TestStringPoolInterning()
     printf("[PASS] TestStringPoolInterning\n");
 }
 
-void TestStringPoolFormatInterning()
+void TestStringPoolFormatInterning(void)
 {
     struct StringPool *pool = CreateStringPool(512, MB(1), OOM_RETURN_NULL, NULL);
     ASSERT_TRUE(pool != NULL, "Failed to create string pool");
@@ -187,7 +187,7 @@ void callbackFunction(MemoryArena *arena, size_t requestedSize)
     callbackRequestedSize = requestedSize;
 }
 
-void TestOOMCallback()
+void TestOOMCallback(void)
 {
     // Reset callback state
     callbackCalled = false;
@@ -211,7 +211,7 @@ void TestOOMCallback()
     printf("[PASS] TestOOMCallback\n");
 }
 
-int main()
+int main(void)
 {
     printf("================================\n");
     printf("Running Memory Arena Unit Tests\n");
