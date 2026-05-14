@@ -198,7 +198,7 @@ void EndTempArena(struct TempArena temp);
  * @return A pointer to the allocated struct, or NULL if allocation fails.
  */
 #define PushStructNoInit(arena, type) \
-    ((type *)arenaAllocAlign((arena), sizeof(type), _Alignof(type)))
+    ((type *)arenaAllocAlign((arena), sizeof(type), ALIGNOF(type)))
 
 /** @brief Allocates an array of structs with no zero-initialisation. Unsafe but fast
  * @param arena The memory arena to allocate from.
@@ -207,7 +207,7 @@ void EndTempArena(struct TempArena temp);
  * @return A pointer to the allocated array, or NULL if allocation fails.
  */
 #define PushArrayNoInit(arena, type, count) \
-    ((type *)arenaAllocAlign((arena), sizeof(type) * (count), _Alignof(type)))
+    ((type *)arenaAllocAlign((arena), sizeof(type) * (count), ALIGNOF(type)))
 
 /** @brief Pushes a raw block of unaligned memory with no zero-initialisation. Unsafe but fast
  * @param arena The memory arena to allocate from.
@@ -249,7 +249,7 @@ static inline void *arenaPushDataHelper(struct MemoryArena *arena, const void *d
  * @return A pointer to the allocated struct, or NULL if allocation fails.
  */
 #define PushStruct(arena, type) \
-    ((type *)arenaAllocAlignZero((arena), sizeof(type), _Alignof(type)))
+    ((type *)arenaAllocAlignZero((arena), sizeof(type), ALIGNOF(type)))
 
 /** @brief Allocates an array of structs with zero-initialisation. Safe but slower.
  * @param arena The memory arena to allocate from.
@@ -258,7 +258,7 @@ static inline void *arenaPushDataHelper(struct MemoryArena *arena, const void *d
  * @return A pointer to the allocated array, or NULL if allocation fails.
  */
 #define PushArray(arena, type, count) \
-    ((type *)arenaAllocAlignZero((arena), sizeof(type) * (count), _Alignof(type)))
+    ((type *)arenaAllocAlignZero((arena), sizeof(type) * (count), ALIGNOF(type)))
 
 /** @brief Pushes a raw block of unaligned memory, zero initialised. Safe but slower.
  * @param arena The memory arena to allocate from.
