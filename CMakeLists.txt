@@ -19,11 +19,6 @@ endif()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-# Enable warnings for GCC and Clang
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Werror -g -fsanitize=address,undefined -fno-omit-frame-pointer")
-endif()
-
 
 # -----------------------------
 # Build the MemoryArena library
@@ -39,18 +34,29 @@ target_sources(MemoryArena
 )
 
 # Include the header files for the MemoryArena library
-target_include_directories(MemoryArena PUBLIC include)
+target_include_directories(MemoryArena PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Enable warnings for GCC and Clang
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(MemoryArena PRIVATE -Wall -Wextra -pedantic -g)
+
+    if(ARENA_ENABLE_ASAN)
+        target_compile_options(MemoryArena PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(MemoryArena PRIVATE -fsanitize=address,undefined)
+    endif()
+endif()
 
 # -----------------------------
 # Testing setup
 # -----------------------------
+if(PROJECT_IS_TOP_LEVEL)
+    include(CTest)
+    enable_testing()
 
-include(CTest)
-enable_testing()
+    add_executable(TestMemoryArena tests/testArena.c)
 
-add_executable(TestMemoryArena tests/testArena.c)
+    # Link the MemoryArena library to the test executable
+    target_link_libraries(TestMemoryArena PRIVATE MemoryArena)
 
-# Link the MemoryArena library to the test executable
-target_link_libraries(TestMemoryArena PRIVATE MemoryArena)
-
-add_test(NAME CoreArenaTests COMMAND TestMemoryArena)
+    add_test(NAME CoreArenaTests COMMAND TestMemoryArena)
+endif()
