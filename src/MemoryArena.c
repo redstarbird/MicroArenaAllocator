@@ -161,19 +161,23 @@ struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCa
         return NULL;
     }
 
+    // Set the OOM policy and callback for the arena
+    arena->oomPolicy = policy;
+    arena->oomCallback = oomCallback;
+
     // Initialize the first block of the arena
-    arena->currentBlock = (struct ArenaBlock *)malloc(sizeof(struct ArenaBlock));
+    arena->currentBlock = (struct ArenaBlock *)ARENA_SYS_ALLOC(sizeof(struct ArenaBlock));
     if (!arena->currentBlock)
     {
-        free(arena);
+        ARENA_SYS_FREE(arena, sizeof(struct MemoryArena));
         return NULL;
     }
 
-    arena->currentBlock->buffer = (char *)malloc(size);
+    arena->currentBlock->buffer = (char *)ARENA_SYS_ALLOC(size);
     if (!arena->currentBlock->buffer)
     {
-        free(arena->currentBlock);
-        free(arena);
+        ARENA_SYS_FREE(arena->currentBlock, sizeof(struct ArenaBlock));
+        ARENA_SYS_FREE(arena, sizeof(struct MemoryArena));
         return NULL;
     }
 
@@ -211,30 +215,40 @@ void DestroyArena(struct MemoryArena *arena)
     while (current != NULL)
     {
         struct ArenaBlock *prev = current->prev;
-        free(current->buffer);
-        free(current);
+        // Free the buffer for the current block and then free the block itself
+        ARENA_SYS_FREE(current->buffer, current->size);
+        ARENA_SYS_FREE(current, sizeof(struct ArenaBlock));
+
         current = prev;
     }
     ARENA_SYS_FREE(arena, sizeof(struct MemoryArena));
 #endif
 }
-#ifdef ARENA_USE_VIRTUAL_MEMORY
-void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
-#else
-void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
-#endif
-{
 
+void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
+{
+#if ARENA_USE_VIRTUAL_MEMORY
     // Calculate the aligned address using bitwise operations
     uintptr_t currentAddress = (uintptr_t)arena->buffer + (uintptr_t)arena->offset;
+#else
+    uintptr_t currentAddress = (uintptr_t)arena->currentBlock->buffer + (uintptr_t)arena->currentBlock->offset;
+#endif
     uintptr_t alignedAddress = (currentAddress + alignment - 1) & ~(alignment - 1);
 
     // Calculate the padding needed to achieve the aligned address
     size_t padding = alignedAddress - currentAddress;
+#if ARENA_USE_VIRTUAL_MEMORY
     size_t newOffset = arena->offset + padding + size;
+#else
+    size_t newOffset = arena->currentBlock->offset + padding + size;
+#endif
 
-    // If the new offset exceeds the arena's reserved size, handle based on the arena's OOM policy
+// If the new offset exceeds the arena's reserved size, handle based on the arena's OOM policy
+#if ARENA_USE_VIRTUAL_MEMORY
     if (newOffset > arena->reservedSize)
+#else
+    if (newOffset > arena->currentBlock->size)
+#endif
     {
         // Handle out of memory based on the arena's OOM policy
         switch (arena->oomPolicy)
@@ -242,7 +256,11 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
         case OOM_RETURN_NULL:
             return NULL;
         case OOM_ABORT:
+#if ARENA_USE_VIRTUAL_MEMORY
             fprintf(stderr, "Out of memory in arena allocation. Requested size: %zu bytes, available: %zu, reserved size: %zu, OOM policy: %d\n", size, arena->committedSize - arena->offset, arena->reservedSize, arena->oomPolicy);
+#else
+            fprintf(stderr, "Out of memory in arena allocation. Requested size: %zu bytes, current block size: %zu, OOM policy: %d\n", size, arena->currentBlock->size, arena->oomPolicy);
+#endif
             abort();
         case OOM_CALLBACK:
             if (arena->oomCallback)
@@ -255,13 +273,15 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
 
         case OOM_GROW_ARENA:
         {
-#ifdef ARENA_USE_VIRTUAL_MEMORY
+#if ARENA_USE_VIRTUAL_MEMORY
 
 #if defined(_M_X64) || defined(__x86_64__)
             // On 64-bit platforms the 1TB reservation acts as the grow logic
             // If the arena is already at this maximum 1TB reservation size, it cannot grow anymore so return NULL
 
-            return NULL; // Cannot grow anymore, return NULL
+            // Cannot grow anymore, return NULL
+            // Ensure the caller handles this case properly to avoid unexpected behavior.
+            return NULL;
 #else
             // For 32-bit platforms, we can grow the arena by reserving a new block of virtual memory and linking it to the current arena
             MemoryArena *nextBlock = CreateArena(arena->reservedSize, OOM_GROW_ARENA, arena->oomCallback);
@@ -291,7 +311,8 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
             struct ArenaBlock *newBlock = (struct ArenaBlock *)ARENA_SYS_ALLOC(sizeof(struct ArenaBlock));
             if (!newBlock)
             {
-                return NULL; // Failed to allocate new block
+                // Failed to allocate new block
+                return NULL;
             }
 
             // If the requested size is larger than the current block size, a new block can be allocated that is large enough to contain the requested size, otherwise we can just allocate a block of the same size as the current block
@@ -299,13 +320,13 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
 
             if (newSize == 0)
             {
-                ARENA_SYS_FREE(newBlock);
+                ARENA_SYS_FREE(newBlock, sizeof(struct ArenaBlock));
                 return NULL; // Invalid size, return NULL
             }
-            newBlock->buffer = (char *)malloc(newSize);
+            newBlock->buffer = (char *)ARENA_SYS_ALLOC(newSize);
             if (!newBlock->buffer)
             {
-                ARENA_SYS_FREE(newBlock);
+                ARENA_SYS_FREE(newBlock, sizeof(struct ArenaBlock));
                 return NULL; // Failed to allocate buffer for new block
             }
 
@@ -315,18 +336,23 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
 
             arena->currentBlock = newBlock;
 
-            currentAddress = (uintptr_t)arena->currentBlock->buffer + (uintptr_t)arena->offset;
+            currentAddress = (uintptr_t)arena->currentBlock->buffer + (uintptr_t)arena->currentBlock->offset;
 #endif // !ARENA_USE_VIRTUAL_MEMORY
        // After handling the OOM situation, recalculate the aligned address and padding for the new block
 
             alignedAddress = (currentAddress + alignment - 1) & ~(alignment - 1);
             padding = alignedAddress - currentAddress;
+#if ARENA_USE_VIRTUAL_MEMORY
             newOffset = arena->offset + padding + size;
-            break;
+#else
+            newOffset = arena->currentBlock->offset + padding + size;
+#endif
+
         } // Extra scope for OOM_GROW_ARENA case (C11 and older C standards do not allow declarations in switch cases without extra scope)
         }
     }
 
+#if ARENA_USE_VIRTUAL_MEMORY
     // Commit more memory if needed for the new offset
     if (newOffset > arena->committedSize)
     {
@@ -344,15 +370,35 @@ void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
             arena->committedSize = commitSize;
         }
     }
+#endif
 
-    // Move the offset to the aligned address
+// Move the offset to the aligned address
+#if ARENA_USE_VIRTUAL_MEMORY
     arena->offset += padding + size;
+#else
+    arena->currentBlock->offset += padding + size;
+#endif
 
+#if ARENA_USE_VIRTUAL_MEMORY
     // Update the peak offset if necessary
     if (arena->offset > arena->peakOffset)
     {
         arena->peakOffset = arena->offset;
     }
+#else
+    // Update the peak offset in non-virtual memory mode
+    size_t totalUsed = 0;
+    struct ArenaBlock *block = arena->currentBlock;
+    while (block)
+    {
+        totalUsed += block->offset;
+        block = block->prev;
+    }
+    if (totalUsed > arena->peakOffset)
+    {
+        arena->peakOffset = totalUsed;
+    }
+#endif
 
     // Return the aligned address
     return (void *)alignedAddress;
@@ -392,8 +438,8 @@ void EndTempArena(struct TempArena temp)
     while (block != temp.startBlock)
     {
         struct ArenaBlock *prev = block->prev;
-        free(block->buffer);
-        free(block);
+        ARENA_SYS_FREE(block->buffer, block->size);
+        ARENA_SYS_FREE(block, sizeof(struct ArenaBlock));
         block = prev;
     }
 
