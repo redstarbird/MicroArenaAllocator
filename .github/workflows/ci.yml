@@ -1,0 +1,58 @@
+name: C/C++ CI Pipeline
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+
+jobs:
+    test-platforms:
+        name: ${{ matrix.name }}
+        runs-on: ${{ matrix.os }}
+
+        # Create a matrix of different OS and CMake configurations to test various scenarios
+        strategy:
+            fail-fast: false # If one VM fails, let Linux keep running to detect more issues
+            matrix:
+                include:
+                    - name: "Linux (64-bit, Virtual Memory)"
+                      os: ubuntu-latest
+                      cmake_args: ""
+
+                    - name: "Windows (64-bit, Virtual Memory)"
+                      os: windows-latest
+                      cmake_args: ""
+
+                    - name: "macOS (64-bit, Virtual Memory)"
+                      os: macos-latest
+                      cmake_args: ""
+
+                    - name: "Linux (32-bit, Virtual Memory)"
+                      os: ubuntu-latest
+                      cmake_args: "-DBUILD_32_BIT=ON"
+
+                    - name: "Linux (64-bit, Malloc Fallback)"
+                      os: ubuntu-latest
+                      cmake_args: "-DFORCE_MALLOC_FALLBACK=ON"
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            # Install 32-bit C libraries on Linux if running the 32-bit test
+            - name: Install 32-bit multilib (Linux Only)
+              if: matrix.name == 'Linux (32-bit, Virtual Memory)'
+              run: sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib
+
+            # Configure CMake using the specific arguments from the matrix
+            - name: Configure CMake
+              run: cmake -B build -S . ${{ matrix.cmake_args }}
+
+            - name: Build
+              run: cmake --build build
+
+            # Run CTest
+            - name: Run Tests
+              working-directory: ./build
+              run: ctest --output-on-failure
