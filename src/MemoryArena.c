@@ -43,7 +43,7 @@ struct MemoryArena
     size_t peakOffset;
 
     // Out of memory handling policy for the arena
-    oomPolicy oomPolicy;
+    enum oomPolicy oomPolicy;
     // Optional callback function for OOM handling when the policy is OOM_CALLBACK
     void (*oomCallback)(struct MemoryArena *arena, size_t requestedSize);
 };
@@ -54,15 +54,35 @@ struct MemoryArena
 void OutputArenaStats(struct MemoryArena *arena)
 {
     printf("Memory Arena Stats:\n");
+
+#if ARENA_USE_VIRTUAL_MEMORY
+    // Virtual memory implementation
     printf("Allocated Size: %zu bytes\n", arena->committedSize);
     if (arena->oomPolicy == OOM_GROW_ARENA)
     {
         printf("Reserved Size: %zu bytes\n", arena->reservedSize);
     }
-
     printf("Used: %zu bytes\n", arena->offset);
     printf("Peak Usage: %zu bytes\n", arena->peakOffset);
     printf("Free: %zu bytes\n", arena->committedSize - arena->offset);
+#else
+    // Non-virtual memory implementation
+    size_t totalSize = 0;
+    size_t usedSize = 0;
+    struct ArenaBlock *block = arena->currentBlock;
+
+    while (block)
+    {
+        totalSize += block->size;
+        usedSize += block->offset;
+        block = block->prev;
+    }
+
+    printf("Total Size: %zu bytes\n", totalSize);
+    printf("Used: %zu bytes\n", usedSize);
+    printf("Peak Usage: %zu bytes\n", arena->peakOffset);
+    printf("Free: %zu bytes\n", totalSize - usedSize);
+#endif
 
     // Print the OOM policy of the arena
     printf("OOM Policy: ");
@@ -198,8 +218,11 @@ void DestroyArena(struct MemoryArena *arena)
     ARENA_SYS_FREE(arena, sizeof(struct MemoryArena));
 #endif
 }
-
+#ifdef ARENA_USE_VIRTUAL_MEMORY
 void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
+#else
+void *arenaAllocAlign(struct ArenaBlock *arena, size_t size, size_t alignment)
+#endif
 {
 
     // Calculate the aligned address using bitwise operations
