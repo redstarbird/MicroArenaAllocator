@@ -43,10 +43,7 @@ struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum o
 
     // Allocate memory for the StringView hash
     // pool->strings = (struct StringView *)arenaAllocAlign(pool->arena, sizeof(struct StringView) * stringCount, _alignof(struct StringView));
-    printf("Allocating memory for %zu string views\n", stringCount);
     pool->strings = PushArray(pool->arena, struct StringView, stringCount);
-
-    printf("Alocated memory for %zu string views at address: %p\n", stringCount, (void *)pool->strings);
 
     return pool;
 }
