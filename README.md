@@ -98,7 +98,7 @@ By design, `MicroMemoryArena` is not thread safe.
 This library is designed to be as efficient as possible so having locking mechanisms such as OS mutexes or atomic hardware locks would kill the $O(1)$ allocation speed.
 
 ### Best practice for multi-threading
-To safely use multi-threading with this library, do not share a single arena across multiple threads/workers. Instead, use [Thread-Local Storage](https://en.wikipedia.org/wiki/Thread-local_storage) to give a seperate, private, lock-free arena to each thread.
+To safely use multi-threading with this library, do not share a single arena across multiple threads/workers. Instead, use [Thread-Local Storage](https://en.wikipedia.org/wiki/Thread-local_storage) to give a separate, private, lock-free arena to each thread.
 ```c
 // Thread locking example using _Thread_local
 _Thread_local struct MemoryArena* threadArena = NULL;
