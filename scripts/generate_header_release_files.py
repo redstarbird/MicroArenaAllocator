@@ -79,4 +79,4 @@ def generate():
 
 if __name__ == "__main__":
     generate()
-    print("Sucessfully generated source and header release files")
+    print("Successfully generated source and header release files")
