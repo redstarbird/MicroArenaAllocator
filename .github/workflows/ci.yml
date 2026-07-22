@@ -36,13 +36,17 @@ jobs:
                       os: ubuntu-latest
                       cmake_args: "-DFORCE_MALLOC_FALLBACK=ON"
 
+                    - name: "Linux (32-bit, Malloc Fallback)"
+                      os: ubuntu-latest
+                      cmake_args: "-DFORCE_MALLOC_FALLBACK=ON -DBUILD_32_BIT=ON"
+
         steps:
             - name: Checkout Code
               uses: actions/checkout@v4
 
             # Install 32-bit C libraries on Linux if running the 32-bit test
             - name: Install 32-bit multilib (Linux Only)
-              if: "matrix.name == 'Linux (32-bit, Virtual Memory)' || matrix.name == 'linux (32-bit, virtual memory)'"
+              if: contains(matrix.name, 'Linux (32-bit')
               run: sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib
 
             # Configure CMake using the specific arguments from the matrix
