@@ -24,10 +24,13 @@ jobs:
                       os: windows-latest
                       cmake_args: ""
 
-                    - name: "macOS (64-bit, Virtual Memory)"
+                    - name: "macOS (Apple Silicon/ARM64, Virtual Memory)"
                       os: macos-latest
                       cmake_args: ""
 
+                    - name: "macOS (Intel/x86_64, Virtual Memory)"
+                      os: macos-13
+                      cmake_args: ""
                     - name: "Linux (32-bit, Virtual Memory)"
                       os: ubuntu-latest
                       cmake_args: "-DBUILD_32_BIT=ON"
