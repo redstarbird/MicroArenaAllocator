@@ -22,6 +22,10 @@ HEADER_NAME = "MemoryArena.h"
 
 SOURCE_NAME = "MemoryArena.c"
 
+HEADER_SOURCE_FOLDER = "header_and_source"
+
+SINGLE_HEADER_FOLDER = "single_header"
+
 # Removes local includes
 def remove_local_includes(text):
     return re.sub("#include\s+\"[^\"]+\"", "", text)
@@ -31,8 +35,11 @@ def open_and_remove_includes(filepath):
         return remove_local_includes(f.read())
 
 def generate():
-    # Make dir if not exists
+    # Make dirs if not exists
     os.makedirs(BUILD_FOLDER, exist_ok=True)
+    os.makedirs(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}", exist_ok=True)
+    os.makedirs(f"{BUILD_FOLDER}/{SINGLE_HEADER_FOLDER}", exist_ok=True)
+
 
     # Build header content string with each header seperated by two newlines
     header_content = ""
@@ -45,20 +52,20 @@ def generate():
         source_content += (open_and_remove_includes(source) + "\n\n") 
 
     # Create header and source pair
-    with open(f"{BUILD_FOLDER}/{HEADER_NAME}", "w") as f:
+    with open(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{HEADER_NAME}", "w") as f:
         f.write(header_content)
 
-    with open(f"{BUILD_FOLDER}/{SOURCE_NAME}", "w") as f:
+    with open(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{SOURCE_NAME}", "w") as f:
         f.write(f"#include \"{HEADER_NAME}\"")
         f.write(source_content)
 
     # Zip source file and header file pair
     with zipfile.ZipFile("release_build/MicroArenaSource.zip", mode="w") as zip:
-        zip.write(f"{BUILD_FOLDER}/{HEADER_NAME}", HEADER_NAME)
-        zip.write(f"{BUILD_FOLDER}/{SOURCE_NAME}", SOURCE_NAME)
+        zip.write(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{HEADER_NAME}", HEADER_NAME)
+        zip.write(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{SOURCE_NAME}", SOURCE_NAME)
 
     # Create STB-style single header
-    with open(f"{BUILD_FOLDER}/{HEADER_NAME}", "w") as f:
+    with open(f"{BUILD_FOLDER}/{SINGLE_HEADER_FOLDER}/{HEADER_NAME}", "w") as f:
         # Inject comment message at the top
         f.write("/* Memory Arena */\n")
         f.write("/*In one C/C++ file, do: #define MEMORY_ARENA_IMPLEMENTATION*/\n")
