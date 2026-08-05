@@ -61,7 +61,7 @@
 #endif
 
 // Return the operating system's memory page size
-size_t ArenaGetOSPageSize(void)
+static inline size_t ArenaGetOSPageSize(void)
 {
     // Cache the page size in a static variable to avoid redundant system calls
     static size_t pageSize = 0;
