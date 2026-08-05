@@ -8,8 +8,8 @@ Based off of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - **Initial beta release**
-- **Core memory arena management**: Memory arena's can be effectively created and destroyed using `CreateArena` and `DestroyArena` respectively
-- **Data sizing macros**: Easily create arena's of specific sizes without having to write large numbers (`KB`, `MB`, `GB`, `TB`)
+- **Core memory arena management**: Memory arenas can be effectively created and destroyed using `CreateArena` and `DestroyArena` respectively
+- **Data sizing macros**: Easily create arenas of specific sizes without having to write large numbers (`KB`, `MB`, `GB`, `TB`)
 - **Uninitialised macros**: High performance uninitialised allocation macros for faster, uninitialized memory blocks (`PushStructNoInit`, `PushArrayNoInit`, `PushSizeNoInit`)
 - **Zero-initialised macros**: Safe, Zero-initialised allocation macros for safer memory allocation (`PushStruct`, `PushArray`, `PushSize`)
 - **Raw data copying**: Raw data copying macro for strings and raw byte blocks (`PushData`)
