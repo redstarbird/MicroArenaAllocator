@@ -1,5 +1,17 @@
+#if defined(TEST_SINGLE_HEADER)
+
+#define MEMORY_ARENA_IMPLEMENTATION
+#include "MemoryArena.h"
+
+#elif defined(TEST_SOURCE_HEADER)
+
+#include "MemoryArena.h"
+
+#else
 #include "../include/MemoryArena.h"
 #include "../include/StringPool.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

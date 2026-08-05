@@ -53,10 +53,45 @@ if(PROJECT_IS_TOP_LEVEL)
     include(CTest)
     enable_testing()
 
+    # Option to test the generated release files from the "scripts/generate_header_release_files.py" script
+    option(TEST_RELEASE_ARTIFACTS "Build and run tests for generated release files" OFF)
+
     add_executable(TestMemoryArena tests/testArena.c)
 
     # Link the MemoryArena library to the test executable
     target_link_libraries(TestMemoryArena PRIVATE MemoryArena)
 
     add_test(NAME CoreArenaTests COMMAND TestMemoryArena)
+
+    if (TEST_RELEASE_ARTIFACTS)
+
+        # Createtest for amalgamated header/source pair
+        add_executable(TestAmalgamated tests/testArena.c ${CMAKE_CURRENT_SOURCE_DIR}/release_build/header_and_source/MemoryArena.c)
+        target_include_directories(TestAmalgamated PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/release_build/header_and_source)
+        target_compile_definitions(TestAmalgamated PRIVATE TEST_SOURCE_HEADER)
+        add_test(NAME AmalgamatedTests COMMAND TestAmalgamated)
+
+        # Create test for single header
+        add_executable(TestSingleHeader tests/testArena.c)
+        target_include_directories(TestSingleHeader PRIVATE ${CMAKE_SOURCE_DIR}/release_build/single_header)
+        target_compile_definitions(TestSingleHeader PRIVATE TEST_SINGLE_HEADER)
+        add_test(NAME SingleHeaderTests COMMAND TestSingleHeader)
+
+        # Apply appropriate sanitisers and warnings and stuff
+        if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+            # Compile warnings
+            target_compile_options(TestAmalgamated PRIVATE -Wall -Wextra -pedantic -g)
+            target_compile_options(TestSingleHeader PRIVATE -Wall -Wextra -pedantic -g)
+
+            # Sanitisers (if options enabled)
+            if(ARENA_ENABLE_ASAN)
+                target_compile_options(TestAmalgamated PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+                target_link_options(TestAmalgamated PRIVATE -fsanitize=address,undefined)
+                target_compile_options(TestSingleHeader PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+                target_link_options(TestSingleHeader PRIVATE -fsanitize=address,undefined)
+            endif()
+        endif()
+
+    endif()
+
 endif()
