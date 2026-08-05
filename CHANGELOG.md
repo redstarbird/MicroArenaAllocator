@@ -7,12 +7,12 @@ Based off of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Initial beta release of the library
-- Core memory arena management (`CreateArena`, `DestroyArena`)
-- Easy data sizing macros (`KB`, `MB`, `GB`, `TB`)
-- High performance uninitialised allocation macros for faster, uninitialized memory blocks (`PushStructNoInit`, `PushArrayNoInit`, `PushSizeNoInit`)
-- Safe, Zero-initialised allocation macros for safer memory allocation (`PushStruct`, `PushArray`, `PushSize`)
-- Raw data copying macro for strings and raw byte blocks (`PushData`)
+- **Initial beta release**
+- **Core memory arena management**: Memory arena's can be effectively created and destroyed using `CreateArena` and `DestroyArena` respectively
+- **Data sizing macros**: Easily create arena's of specific sizes without having to write large numbers (`KB`, `MB`, `GB`, `TB`)
+- **Uninitialised macros**: High performance uninitialised allocation macros for faster, uninitialized memory blocks (`PushStructNoInit`, `PushArrayNoInit`, `PushSizeNoInit`)
+- **Zero-initialised macros**: Safe, Zero-initialised allocation macros for safer memory allocation (`PushStruct`, `PushArray`, `PushSize`)
+- **Raw data copying**: Raw data copying macro for strings and raw byte blocks (`PushData`)
 - **Virtual Memory Backend**: Direct OS integration via `mmap` (POSIX) and `VirtualAlloc` (Windows) for zero-cost virtual address reservation
 - **Malloc Fallback Backend**: Seamlessly falls back to chaining standard heap blocks on systems without Virtual Memory
 - **Dynamic OS Page Sizing**: Queries the OS at runtime to ensure perfect physical RAM alignment across x86 (4KB), Apple Silicon (16KB), and WebAssembly (64KB)
