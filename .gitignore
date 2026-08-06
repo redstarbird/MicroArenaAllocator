@@ -13,3 +13,6 @@ build/
 
 # Built source/header release directory
 release_build/
+
+# Release notes generated from CHANGELOG.md
+release_notes.md
