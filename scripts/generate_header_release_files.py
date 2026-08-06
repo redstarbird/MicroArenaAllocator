@@ -56,7 +56,7 @@ def generate():
         f.write(header_content)
 
     with open(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{SOURCE_NAME}", "w") as f:
-        f.write(f"#include \"{HEADER_NAME}\"")
+        f.write(f"#include \"{HEADER_NAME}\"\n")
         f.write(source_content)
 
     # Zip source file and header file pair
