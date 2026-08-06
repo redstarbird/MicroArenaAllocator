@@ -60,7 +60,7 @@ def generate():
         f.write(source_content)
 
     # Zip source file and header file pair
-    with zipfile.ZipFile("release_build/MicroArenaSource.zip", mode="w") as zip:
+    with zipfile.ZipFile("release_build/MicroArena.zip", mode="w") as zip:
         zip.write(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{HEADER_NAME}", HEADER_NAME)
         zip.write(f"{BUILD_FOLDER}/{HEADER_SOURCE_FOLDER}/{SOURCE_NAME}", SOURCE_NAME)
 
