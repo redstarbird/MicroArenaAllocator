@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ArenaAllocator VERSION 0.1.0 LANGUAGES C)
+project(MicroArena VERSION 0.1.0 LANGUAGES C)
 
 # --- Build Options ---
 option(FORCE_MALLOC_FALLBACK "Force the arena to use standard malloc instead of virtual memory" OFF)
