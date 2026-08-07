@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+// Asserts whether a condition is true and outputs a provided error message if not
 #define ASSERT_TRUE(condition, message)                                         \
     do                                                                          \
     {                                                                           \
@@ -28,6 +29,7 @@
         }                                                                       \
     } while (0)
 
+// Asserts whether two values are equal and outputs a provided error message if not
 #define ASSERT_EQUALS(expected, actual, message)                                                                                      \
     do                                                                                                                                \
     {                                                                                                                                 \
@@ -38,6 +40,7 @@
         }                                                                                                                             \
     } while (0)
 
+// Test basic allocations in the arena and check that they are in the correct positions
 void TestBasicAllocation(void)
 {
     struct MemoryArena *arena = CreateArena(MB(1), OOM_RETURN_NULL, NULL);
@@ -56,6 +59,7 @@ void TestBasicAllocation(void)
     printf("[PASS] TestBasicAllocation\n");
 }
 
+// Test the OOM_RETURN_NULL policy, this should return NULL when the arena is full
 void TestOOMReturnNull(void)
 {
     struct MemoryArena *arena = CreateArena(KB(1), OOM_RETURN_NULL, NULL);
@@ -73,6 +77,7 @@ void TestOOMReturnNull(void)
     printf("[PASS] TestOOMReturnNull\n");
 }
 
+// Test that memory is correctly aligned in arena allocations
 void TestMemoryAlignment(void)
 {
     MemoryArena *arena = CreateArena(KB(4), OOM_RETURN_NULL, NULL);
@@ -90,6 +95,7 @@ void TestMemoryAlignment(void)
     printf("[PASS] TestMemoryAlignment\n");
 }
 
+// Test that the OOM_GROW_ARENA policy correctly grows an arena when it is full
 void TestOOMGrowChaining(void)
 {
     // Create an arena with a small initial size and OOM_GROW_ARENA policy
@@ -112,6 +118,7 @@ void TestOOMGrowChaining(void)
     printf("[PASS] TestOOMGrowChaining\n");
 }
 
+// Test temporary arena functionality
 void TestTempArena(void)
 {
     struct MemoryArena *arena = CreateArena(MB(2), OOM_RETURN_NULL, NULL);
@@ -138,6 +145,7 @@ void TestTempArena(void)
     printf("[PASS] TestTempArena\n");
 }
 
+// Check that strings are interned into the pool properly and that the same duplicate string isn't duplicated in the pool
 void TestStringPoolInterning(void)
 {
     struct StringPool *pool = CreateStringPool(512, MB(1), OOM_RETURN_NULL, NULL);
@@ -159,6 +167,7 @@ void TestStringPoolInterning(void)
     printf("[PASS] TestStringPoolInterning\n");
 }
 
+// Check the string pool format intern function to check that it adds the correct formatted string
 void TestStringPoolFormatInterning(void)
 {
     struct StringPool *pool = CreateStringPool(512, MB(1), OOM_RETURN_NULL, NULL);
@@ -191,6 +200,7 @@ void TestStringPoolFormatInterning(void)
 static bool callbackCalled = false;
 static size_t callbackRequestedSize = 0;
 
+// Callback function for TestOOMCallback
 void callbackFunction(MemoryArena *arena, size_t requestedSize)
 {
     ASSERT_TRUE(arena != NULL, "OOM callback received a NULL arena pointer");
@@ -199,6 +209,7 @@ void callbackFunction(MemoryArena *arena, size_t requestedSize)
     callbackRequestedSize = requestedSize;
 }
 
+// Tests the OOM_CALLBACK policy to check that the callback is correctly called when the arena runs out of memory
 void TestOOMCallback(void)
 {
     // Reset callback state
