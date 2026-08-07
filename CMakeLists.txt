@@ -24,7 +24,7 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 # Build the MemoryArena library
 # -----------------------------
 # Define the source files for the MemoryArena library
-add_library(MemoryArena STATIC src/MemoryArena.c)
+add_library(MemoryArena STATIC src/MicroArena.c)
 
 # Add the additional source files for the MemoryArena library
 target_sources(MemoryArena

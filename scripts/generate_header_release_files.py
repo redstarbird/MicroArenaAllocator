@@ -12,7 +12,7 @@ HEADERS = [
 
 SOURCES = [
     "src/Hash.c",
-    "src/MemoryArena.c",
+    "src/MicroArena.c",
     "src/StringPool.c"
 ]
 
