@@ -1,0 +1,40 @@
+name: Release pipeline
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    build-and-release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            # Setup python to use for generating release artifacts
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+
+            - name: Generate Release Files
+              run: python scripts/generate_header_release_files.py
+
+            # Extracts release notes using script
+            - name: Extract Release Notes from CHANGELOG.md
+              run: python scripts/extract_changelog_notes.py
+
+              # Create the release
+            - name: Create Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: |
+                      release_build/MicroArena.zip
+                      release_build/single_header/MicroArena.h
+                  body_path: release_notes.md
+                  # Determine prerelease based on the tag
+                  prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta')}}
