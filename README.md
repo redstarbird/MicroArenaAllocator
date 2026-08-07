@@ -78,7 +78,7 @@ cmake -B build
 cmake --build build --config Release
 ```
 
-### Single header
+### Option 3: Single header
 
 If you prefer to use a STB-style library/header, you can use the single header distribution from the GitHub release of your choice.
 
@@ -101,7 +101,7 @@ In all other files, just use `#include "MicroArena.h"` as normal.
 
 ⚠️ If using a single header release, the string pool functionality will be built into the `MicroArena.h` file rather than a seperate header. ⚠️
 
-### Header/source pair
+### Option 4: Header/source pair
 
 The header source pair distribution contains a single header `MicroArena.h` containing definitions, and a `MicroArena.c` file containing the implementation. This method allows you to not have to define `MICRO_ARENA_IMPLEMENTATION` which can be preferable in large projects.
 
