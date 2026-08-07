@@ -1,8 +1,10 @@
-name: C/C++ CI Pipeline
+name: CI/CD Pipeline
 
 on:
     push:
         branches: ["master"]
+        tags:
+            - "v*"
     pull_request:
         branches: ["master"]
 
@@ -73,3 +75,41 @@ jobs:
             - name: Run Tests
               working-directory: ./build
               run: ctest --output-on-failure -V -C Debug
+
+    build-and-release:
+        needs: test-platforms
+
+        if: startsWith(github.ref, 'refs/tags/v')
+
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            # Setup python to use for generating release artifacts
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+
+            - name: Generate Release Files
+              run: python scripts/generate_header_release_files.py
+
+            # Extracts release notes using script
+            - name: Extract Release Notes from CHANGELOG.md
+              run: python scripts/extract_changelog_notes.py
+
+              # Create the release
+            - name: Create Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  name: Release ${{github.ref_name}}
+                  files: |
+                      release_build/MicroArena.zip
+                      release_build/single_header/MicroArena.h
+                  body_path: release_notes.md
+                  # Determine prerelease based on the tag
+                  prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta')}}
