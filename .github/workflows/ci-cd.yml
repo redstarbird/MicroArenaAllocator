@@ -113,3 +113,4 @@ jobs:
                   body_path: release_notes.md
                   # Determine prerelease based on the tag
                   prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta')}}
+                  draft: true
