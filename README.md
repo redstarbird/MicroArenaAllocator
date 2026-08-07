@@ -9,6 +9,9 @@ An extremely fast, extremely cross-platform, zero-dependency Memory Arena and St
 
 Designed for game engines, compilers, and high-performance systems, this library provides $O(1)$ allocations, completely eliminating the overhead and memory fragmentation of standard `malloc` and `free`.
 
+> [!IMPORTANT]
+> This library is still in beta, so breaking releases will likely occur between versions!
+
 ## 🔥 Key Features
 
 - **Zero-Cost Allocations:** Allocations take a single CPU cycle thanks to simple pointer addition.
