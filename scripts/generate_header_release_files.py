@@ -4,7 +4,7 @@ import zipfile
 
 # Header files
 HEADERS = [
-    "include/MemoryArena.h",
+    "include/MicroArena.h",
     "include/StringPool.h",
     "src/platform.h",
     "src/Hash.h"
