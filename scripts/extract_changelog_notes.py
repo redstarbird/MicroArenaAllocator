@@ -45,7 +45,7 @@ def main():
 
     # Put the release notes into the output file
     with open(output_path, 'w') as file:
-        file.write('\n'.join(release_notes))
+        file.write(''.join(release_notes))
 
     print("Created release notes")
     
