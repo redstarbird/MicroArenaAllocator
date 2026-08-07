@@ -120,7 +120,7 @@ Download the MicroArena.zip file from the GitHub release of your choice, extract
 ### 1. Basic Allocation
 
 ```c
-#include <MemoryArena.h>
+#include <MicroArena.h>
 
 int main() {
     // Reserve a 16MB virtual memory arena (aborts on Out-of-Memory)
@@ -169,7 +169,7 @@ void LoadAssets(struct StringPool* pool) {
 
 ## 🧵 Thread Safety ⚠️
 
-By design, `MicroMemoryArena` is not thread safe.
+By design, `MicroArena` is not thread safe.
 This library is designed to be as efficient as possible so having locking mechanisms such as OS mutexes or atomic hardware locks would kill the $O(1)$ allocation speed.
 
 ### Best practice for multi-threading
