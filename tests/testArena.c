@@ -1,6 +1,6 @@
 #if defined(TEST_SINGLE_HEADER)
 
-#define MEMORY_ARENA_IMPLEMENTATION
+#define MICRO_ARENA_IMPLEMENTATION
 #include "MicroArena.h"
 
 #elif defined(TEST_SOURCE_HEADER)

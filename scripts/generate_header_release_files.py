@@ -67,8 +67,8 @@ def generate():
     # Create STB-style single header
     with open(f"{BUILD_FOLDER}/{SINGLE_HEADER_FOLDER}/{HEADER_NAME}", "w") as f:
         # Inject comment message at the top
-        f.write("/* Memory Arena */\n")
-        f.write("/*In one C/C++ file, do: #define MEMORY_ARENA_IMPLEMENTATION*/\n")
+        f.write("/* Micro Arena */\n")
+        f.write("/*In one C/C++ file, do: #define MICRO_ARENA_IMPLEMENTATION*/\n")
 
         # Header content
         f.write("\n\n\n#ifndef MEMORY_ARENA_H\n")
@@ -80,7 +80,7 @@ def generate():
         f.write("/* IMPLEMENTATION */\n")
         f.write("/* ========================================================= */\n\n")
         
-        f.write("#ifdef MEMORY_ARENA_IMPLEMENTATION\n\n")
+        f.write("#ifdef MICRO_ARENA_IMPLEMENTATION\n\n")
         f.write(source_content)
         f.write("#endif\n")
 
