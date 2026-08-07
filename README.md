@@ -1,6 +1,6 @@
 # ⚡ Micro arena allocator (v0.1.0-beta)
 
-[![C/C++ CI Pipeline](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci.yml/badge.svg)](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci.yml)
+[![C/C++ CI Pipeline](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci-cd.yml)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/redstarbird/MicroArenaAllocator)
 ![GitHub last commit](https://img.shields.io/github/last-commit/redstarbird/MicroArenaAllocator)
