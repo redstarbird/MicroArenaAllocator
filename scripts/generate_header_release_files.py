@@ -71,10 +71,10 @@ def generate():
         f.write("/*In one C/C++ file, do: #define MICRO_ARENA_IMPLEMENTATION*/\n")
 
         # Header content
-        f.write("\n\n\n#ifndef MEMORY_ARENA_H\n")
-        f.write("#define MEMORY_ARENA_H\n")
+        f.write("\n\n\n#ifndef MICROARENA_H\n")
+        f.write("#define MICROARENA_H\n")
         f.write(header_content)
-        f.write("#endif // MEMORY_ARENA_H")
+        f.write("#endif // MICROARENA_H")
 
         f.write("\n\n/* ========================================================= */\n")
         f.write("/* IMPLEMENTATION */\n")

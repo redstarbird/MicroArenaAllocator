@@ -1,5 +1,5 @@
-#ifndef MEMORYARENA_H
-#define MEMORYARENA_H
+#ifndef MICROARENA_H
+#define MICROARENA_H
 /**
  * @file MicroArena.h
  * @brief A high-performance, cross-platform memory arena allocator.
@@ -277,4 +277,4 @@ static inline void *arenaPushDataHelper(struct MemoryArena *arena, const void *d
 #define PushData(arena, data, size) \
     arenaPushDataHelper((arena), (data), (size))
 
-#endif // MEMORYARENA_H
+#endif // MICROARENA_H
