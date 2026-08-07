@@ -66,7 +66,7 @@ if(PROJECT_IS_TOP_LEVEL)
     if (TEST_RELEASE_ARTIFACTS)
 
         # Createtest for amalgamated header/source pair
-        add_executable(TestAmalgamated tests/testArena.c ${CMAKE_CURRENT_SOURCE_DIR}/release_build/header_and_source/MemoryArena.c)
+        add_executable(TestAmalgamated tests/testArena.c ${CMAKE_CURRENT_SOURCE_DIR}/release_build/header_and_source/MicroArena.c)
         target_include_directories(TestAmalgamated PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/release_build/header_and_source)
         target_compile_definitions(TestAmalgamated PRIVATE TEST_SOURCE_HEADER)
         add_test(NAME AmalgamatedTests COMMAND TestAmalgamated)

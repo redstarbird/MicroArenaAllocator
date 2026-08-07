@@ -18,9 +18,9 @@ SOURCES = [
 
 BUILD_FOLDER = "release_build"
 
-HEADER_NAME = "MemoryArena.h"
+HEADER_NAME = "MicroArena.h"
 
-SOURCE_NAME = "MemoryArena.c"
+SOURCE_NAME = "MicroArena.c"
 
 HEADER_SOURCE_FOLDER = "header_and_source"
 

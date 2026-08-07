@@ -7,7 +7,7 @@
  * It is designed to be used in performance-critical applications where many duplicate strings may exist, such as in game engines or compilers.
  */
 
-#include "MemoryArena.h"
+#include "MicroArena.h"
 
 /** *
  * @brief Represents a view into a string stored in the StringPool. Contains a pointer to the string data and its length.
