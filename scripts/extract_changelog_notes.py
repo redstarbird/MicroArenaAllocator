@@ -38,9 +38,10 @@ def main():
         if line.startswith(target_header):
             is_reading = True
 
-    # If is_reading is false, the release notes were never found
+    # If is_reading is false, the release notes were never found so raise error
     if not is_reading:
         print("Error: Release notes for version " + version + " not found!")
+        sys.exit(1)
 
     # Put the release notes into the output file
     with open(output_path, 'w') as file:
