@@ -21,28 +21,28 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 
 # -----------------------------
-# Build the MemoryArena library
+# Build the MicroArena library
 # -----------------------------
-# Define the source files for the MemoryArena library
-add_library(MemoryArena STATIC src/MicroArena.c)
+# Define the source files for the MicroArena library
+add_library(MicroArena STATIC src/MicroArena.c)
 
-# Add the additional source files for the MemoryArena library
-target_sources(MemoryArena
+# Add the additional source files for the MicroArena library
+target_sources(MicroArena
     PRIVATE
         src/StringPool.c
         src/Hash.c
 )
 
-# Include the header files for the MemoryArena library
-target_include_directories(MemoryArena PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Include the header files for the MicroArena library
+target_include_directories(MicroArena PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Enable warnings for GCC and Clang
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(MemoryArena PRIVATE -Wall -Wextra -pedantic -g)
+    target_compile_options(MicroArena PRIVATE -Wall -Wextra -pedantic -g)
 
     if(ARENA_ENABLE_ASAN)
-        target_compile_options(MemoryArena PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
-        target_link_options(MemoryArena PRIVATE -fsanitize=address,undefined)
+        target_compile_options(MicroArena PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(MicroArena PRIVATE -fsanitize=address,undefined)
     endif()
 endif()
 
@@ -56,12 +56,12 @@ if(PROJECT_IS_TOP_LEVEL)
     # Option to test the generated release files from the "scripts/generate_header_release_files.py" script
     option(TEST_RELEASE_ARTIFACTS "Build and run tests for generated release files" OFF)
 
-    add_executable(TestMemoryArena tests/testArena.c)
+    add_executable(TestMicroArena tests/testArena.c)
 
-    # Link the MemoryArena library to the test executable
-    target_link_libraries(TestMemoryArena PRIVATE MemoryArena)
+    # Link the MicroArena library to the test executable
+    target_link_libraries(TestMicroArena PRIVATE MicroArena)
 
-    add_test(NAME CoreArenaTests COMMAND TestMemoryArena)
+    add_test(NAME CoreArenaTests COMMAND TestMicroArena)
 
     if (TEST_RELEASE_ARTIFACTS)
 
