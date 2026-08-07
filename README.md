@@ -29,7 +29,7 @@ MicroArena can be installed in multiple ways to fit your exact setup and workflo
 
 This is the cleanest and easiest way to integrate the library if you are using CMake already. Simply add this to your CMakeLists.txt:
 
-```CMake
+```cmake
 
 include(FetchContent)
 
@@ -46,7 +46,7 @@ FetchContent_MakeAvailable(MicroArena)
 
 Then link it to your target (replace `YourExecutable` with the name of your target/executable):
 
-```CMake
+```cmake
 target_link_libraries(YourExecutable PRIVATE MicroArena)
 ```
 
@@ -62,7 +62,7 @@ git submodule add https://github.com/redstarbird/MicroArenaAllocator.git externa
 
 #### 2. Link with CMake
 
-```CMake
+```cmake
 # Add the submodule
 add_subdirectory(external/MicroArena)
 
