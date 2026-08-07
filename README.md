@@ -102,7 +102,7 @@ In all other files, just use `#include "MicroArena.h"` as normal.
 
 #### ⚠️ Single-header warning
 
-⚠️ If using a single header release, the string pool functionality will be built into the `MicroArena.h` file rather than a seperate header. ⚠️
+⚠️ If using a single header release, the string pool functionality will be built into the `MicroArena.h` file rather than a separate header. ⚠️
 
 ### Option 4: Header/source pair
 
