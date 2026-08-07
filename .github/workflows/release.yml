@@ -32,6 +32,7 @@ jobs:
             - name: Create Release
               uses: softprops/action-gh-release@v1
               with:
+                  name: Release ${{github.ref_name}}
                   files: |
                       release_build/MicroArena.zip
                       release_build/single_header/MicroArena.h
