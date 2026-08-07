@@ -184,7 +184,7 @@ void WorkerThread() {
     if (!threadArena) {
         threadArena = CreateArena(MB(16), OOM_ABORT, NULL);
     }
-    // Safe, effecient parallel allocations
+    // Safe, efficient parallel allocations
 }
 ```
 
