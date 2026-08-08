@@ -55,7 +55,7 @@ typedef struct StringPoolConfig
     enum oomPolicy policy;
 
     /** @brief A callback function to be called when an out-of-memory condition occurs, only if the `oomPolicy` is set to `OOM_CALLBACK` */
-    void (*oomCallback)(struct MemoryArena *, size_t)
+    void (*oomCallback)(struct MemoryArena *, size_t);
 } StringPoolConfig;
 
 /** *
