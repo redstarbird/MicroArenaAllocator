@@ -2,7 +2,7 @@
 
 [![C/C++ CI Pipeline](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/redstarbird/MicroArenaAllocator/actions/workflows/ci-cd.yml)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/redstarbird/MicroArenaAllocator)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/redstarbird/MicroArenaAllocator?include_prereleases)
 ![GitHub last commit](https://img.shields.io/github/last-commit/redstarbird/MicroArenaAllocator)
 
 An extremely fast, extremely cross-platform, zero-dependency Memory Arena and String Pool library for C/C++
