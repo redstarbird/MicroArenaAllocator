@@ -41,6 +41,24 @@ typedef struct StringPool
 } StringPool;
 
 /** *
+ * @brief Used to configure the creation of a string pool. This is passed to the `CreateStringPool` function.
+ */
+struct StringPoolConfig
+{
+    /** @brief The initial number of strings the pool can hold */
+    size_t stringCount;
+
+    /** @brief The size of the internal memory arena */
+    size_t arenaSize;
+
+    /** @brief The out-of-memory policy to use (what the pool should do when full) */
+    enum oomPolicy policy;
+
+    /** @brief A callback function to be called when an out-of-memory condition occurs, only if the `oomPolicy` is set to `OOM_CALLBACK` */
+    void (*oomCallback)(struct MemoryArena *, size_t)
+};
+
+/** *
  * @brief Creates a new string pool with the specified parameters.
  * @param stringCount The initial number of strings the pool can hold.
  * @param arenaSize The size of the internal memory arena.
