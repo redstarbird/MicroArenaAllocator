@@ -3,7 +3,7 @@
 Any features, notable changes and bug fixes will be found in the file.
 Based off of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [0.1.0-beta] - Unreleased
+## [0.1.0-beta] - 2026-08-07
 
 ### Added
 
