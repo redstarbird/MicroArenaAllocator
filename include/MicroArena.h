@@ -104,6 +104,21 @@ enum oomPolicy
     OOM_CALLBACK
 };
 
+/** *
+ * @brief Used to configure the creation of a memory arena. This is passed to the `CreateArena` function.
+ */
+typedef struct ArenaConfig
+{
+    /** @brief The initial size of the arena. */
+    size_t size;
+
+    /** @brief The out-of-memory handling policy. Controls the functionality of the arena when the arena is full */
+    enum oomPolicy policy;
+
+    /** @brief A custom callback function to be called when an out-of-memory situation occurs (only used if policy is OOM_CALLBACK), should be a valid function pointer or NULL.*/
+    void (*oomCallback)(struct MemoryArena *, size_t)
+} ArenaConfig;
+
 /** @brief Creates a new memory arena with the specified size and out-of-memory policy.
  * @param size The initial size of the arena.
  * @param policy The out-of-memory handling policy.
