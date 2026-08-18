@@ -302,7 +302,7 @@ void *arenaAllocAlign(struct MemoryArena *arena, size_t size, size_t alignment)
             return NULL;
 #else
             // For 32-bit platforms, we can grow the arena by reserving a new block of virtual memory and linking it to the current arena
-            MemoryArena *nextBlock = CreateArena(arena->reservedSize, OOM_GROW_ARENA, arena->oomCallback);
+            MemoryArena *nextBlock = CreateArena(&(struct ArenaConfig){.size = arena->reservedSize, .policy = OOM_GROW_ARENA, .oomCallback = arena->oomCallback});
             if (!nextBlock)
             {
                 return NULL; // Failed to create new block
