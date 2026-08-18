@@ -43,7 +43,8 @@
 // Test basic allocations in the arena and check that they are in the correct positions
 void TestBasicAllocation(void)
 {
-    struct MemoryArena *arena = CreateArena(MB(1), OOM_RETURN_NULL, NULL);
+    struct ArenaConfig config = {.size = MB(1), .policy = OOM_RETURN_NULL, .oomCallback = NULL};
+    struct MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
 
     void *ptr1 = PushSize(arena, 100);
@@ -62,7 +63,8 @@ void TestBasicAllocation(void)
 // Test the OOM_RETURN_NULL policy, this should return NULL when the arena is full
 void TestOOMReturnNull(void)
 {
-    struct MemoryArena *arena = CreateArena(KB(1), OOM_RETURN_NULL, NULL);
+    struct ArenaConfig config = {.size = KB(1), .policy = OOM_RETURN_NULL, .oomCallback = NULL};
+    struct MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
 
     // Fill the arena to its capacity
@@ -80,7 +82,8 @@ void TestOOMReturnNull(void)
 // Test that memory is correctly aligned in arena allocations
 void TestMemoryAlignment(void)
 {
-    MemoryArena *arena = CreateArena(KB(4), OOM_RETURN_NULL, NULL);
+    struct ArenaConfig config = {.size = KB(4), .policy = OOM_RETURN_NULL, .oomCallback = NULL};
+    MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Arena failed to create");
 
     char *charPtr = PushStruct(arena, char);
@@ -99,7 +102,9 @@ void TestMemoryAlignment(void)
 void TestOOMGrowChaining(void)
 {
     // Create an arena with a small initial size and OOM_GROW_ARENA policy
-    struct MemoryArena *arena = CreateArena(128, OOM_GROW_ARENA, NULL);
+    struct ArenaConfig config = {.size = 128, .policy = OOM_GROW_ARENA, .oomCallback = NULL};
+
+    struct MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
 
     // Fill most of the arena to force an OOM condition
@@ -121,7 +126,9 @@ void TestOOMGrowChaining(void)
 // Test temporary arena functionality
 void TestTempArena(void)
 {
-    struct MemoryArena *arena = CreateArena(MB(2), OOM_RETURN_NULL, NULL);
+    struct ArenaConfig config = {.size = MB(2), .policy = OOM_RETURN_NULL, .oomCallback = NULL};
+
+    struct MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
 
     // Create a temporary arena
@@ -216,7 +223,8 @@ void TestOOMCallback(void)
     callbackCalled = false;
 
     // Create an arena with a small size and OOM_CALLBACK policy
-    struct MemoryArena *arena = CreateArena(KB(1), OOM_CALLBACK, callbackFunction);
+    struct ArenaConfig config = {.size = KB(1), .policy = OOM_CALLBACK, .oomCallback = callbackFunction};
+    struct MemoryArena *arena = CreateArena(&config);
     ASSERT_TRUE(arena != NULL, "Failed to create arena");
 
     // Push exactly the arena size to fill it up
