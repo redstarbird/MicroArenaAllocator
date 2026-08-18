@@ -161,8 +161,17 @@ struct MemoryArena *CreateArena(const struct ArenaConfig *config)
 }
 #else
 // For non-virtual memory arenas, we need to allocate a block of memory for the arena and manage it using linked blocks if necessary
-struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
+struct MemoryArena *CreateArena(const struct ArenaConfig *config)
 {
+    enum oomPolicy policy = OOM_RETURN_NULL;
+    size_t size = MB(1);
+
+    if (config)
+    {
+        policy = config->policy;
+        size = config->size;
+    }
+
     // Allocate memory for the MemoryArena struct
     struct MemoryArena *arena = (struct MemoryArena *)ARENA_SYS_ALLOC(sizeof(struct MemoryArena));
     if (!arena)
@@ -172,7 +181,7 @@ struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCa
 
     // Set the OOM policy and callback for the arena
     arena->oomPolicy = policy;
-    arena->oomCallback = oomCallback;
+    arena->oomCallback = config ? config->oomCallback : NULL;
 
     // Initialize the first block of the arena
     arena->currentBlock = (struct ArenaBlock *)ARENA_SYS_ALLOC(sizeof(struct ArenaBlock));
