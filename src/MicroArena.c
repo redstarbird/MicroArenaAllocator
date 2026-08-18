@@ -107,8 +107,11 @@ void OutputArenaStats(struct MemoryArena *arena)
 }
 
 #if ARENA_USE_VIRTUAL_MEMORY
-struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t))
+struct MemoryArena *CreateArena(const struct ArenaConfig *config)
 {
+    enum oomPolicy policy = OOM_RETURN_NULL;
+    size_t size = MB(1);
+
 #if defined(_M_X64) || defined(__x86_64__)
     // On 64-bit platforms, an extremely large maximum virtual memory capacity can be reserved
     size_t actualReservedSize = (policy == OOM_GROW_ARENA) ? TB(1) : size;
@@ -144,7 +147,7 @@ struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCa
     arena->offset = 0;
     arena->peakOffset = 0;
     arena->oomPolicy = policy;
-    arena->oomCallback = oomCallback;
+    arena->oomCallback = config ? config->oomCallback : NULL;
     arena->reservedSize = actualReservedSize;
     arena->prev = NULL;
 

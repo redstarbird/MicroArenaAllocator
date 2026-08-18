@@ -30,7 +30,8 @@ struct StringPool *CreateStringPool(size_t stringCount, size_t arenaSize, enum o
     }
 
     // Create the internal memory arena for the string pool
-    pool->arena = CreateArena(arenaSize, policy, oomCallback);
+    struct ArenaConfig config = {.size = arenaSize, .policy = policy, .oomCallback = oomCallback};
+    pool->arena = CreateArena(&config);
     if (!pool->arena)
     {
         free(pool);

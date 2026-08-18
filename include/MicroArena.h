@@ -116,16 +116,14 @@ typedef struct ArenaConfig
     enum oomPolicy policy;
 
     /** @brief A custom callback function to be called when an out-of-memory situation occurs (only used if policy is OOM_CALLBACK), should be a valid function pointer or NULL.*/
-    void (*oomCallback)(struct MemoryArena *, size_t)
+    void (*oomCallback)(struct MemoryArena *, size_t);
 } ArenaConfig;
 
 /** @brief Creates a new memory arena with the specified size and out-of-memory policy.
- * @param size The initial size of the arena.
- * @param policy The out-of-memory handling policy.
- * @param oomCallback A custom callback function to be called when an out-of-memory situation occurs (only used if policy is OOM_CALLBACK) should be a valid function pointer or NULL.
+ * @param config An arena config struct
  * @return A pointer to the newly created memory arena, or NULL if creation fails.
  */
-struct MemoryArena *CreateArena(size_t size, enum oomPolicy policy, void (*oomCallback)(struct MemoryArena *, size_t));
+struct MemoryArena *CreateArena(const struct ArenaConfig *config);
 
 /** @brief Allocates a block of memory from the arena with the specified size and alignment.
  * @param arena The memory arena to allocate from.
