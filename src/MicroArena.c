@@ -112,6 +112,12 @@ struct MemoryArena *CreateArena(const struct ArenaConfig *config)
     enum oomPolicy policy = OOM_RETURN_NULL;
     size_t size = MB(1);
 
+    if (config)
+    {
+        policy = config->policy;
+        size = config->size;
+    }
+
 #if defined(_M_X64) || defined(__x86_64__)
     // On 64-bit platforms, an extremely large maximum virtual memory capacity can be reserved
     size_t actualReservedSize = (policy == OOM_GROW_ARENA) ? TB(1) : size;
